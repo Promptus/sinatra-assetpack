@@ -45,9 +45,10 @@ module Sinatra
           raise Error, "Please set :root in your Sinatra app."
         end
 
-        @app             = app
-        @js_compression  = :jsmin
-        @css_compression = :simple
+        @app              = app
+        @environments     = [:production]
+        @js_compression   = :jsmin
+        @css_compression  = :simple
 
         begin
           @output_path   = app.public
@@ -145,9 +146,10 @@ module Sinatra
         @packages["#{name}.#{type}"] = Package.new(self, name, type, path, files)
       end
 
-      attr_reader   :app        # Sinatra::Base instance
-      attr_reader   :packages   # Hash, keys are "foo.js", values are Packages
-      attr_reader   :served     # Hash, paths to be served.
+      attr_reader :app          # Sinatra::Base instance
+      attr_reader :environments # Array, [:production, :staging, etc...]
+      attr_reader :packages     # Hash, keys are "foo.js", values are Packages
+      attr_reader :served       # Hash, paths to be served.
                                 # Key is URI path, value is local path
 
       attrib :js_compression    # Symbol, compression method for JS
@@ -159,6 +161,10 @@ module Sinatra
       attrib :css_compression_options  # Hash
 
       attrib :prebuild          # Bool
+
+      def prod_envs(*args)
+        @environments = args unless args.empty?
+      end
 
       def expires(*args)
         if args.empty?
